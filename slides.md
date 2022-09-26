@@ -335,4 +335,91 @@ type Movie {
 
 # Step 4: Seed the Database
 
-[TODO]
+- The `platformatic db seed` command allow to run a script that populates the DB.
+- `seed.js` needs to export a function: 
+
+
+```js
+'use strict'
+
+module.exports = async function ({ entities, db, sql }) {
+  await entities.graph.save({ input: { name: 'Hello' } })
+  await db.query(sql`
+    INSERT INTO graphs (name) VALUES ('Hello 2');
+  `)
+}
+
+```
+
+---
+
+# seed.js (1/2)
+
+```js
+
+const quotes = [
+  {
+    quote: "Toto, I've got a feeling we're not in Kansas anymore.",
+    saidBy: 'Dorothy Gale',
+    movie: 'The Wizard of Oz'
+  },
+  {
+    quote: "You're gonna need a bigger boat.",
+    saidBy: 'Martin Brody',
+    movie: 'Jaws'
+  },
+  {
+    quote: 'May the Force be with you.',
+    saidBy: 'Han Solo',
+    movie: 'Star Wars'
+  },
+  {
+    quote: 'I have always depended on the kindness of strangers.',
+    saidBy: 'Blanche DuBois',
+    movie: 'A Streetcar Named Desire'
+  }
+]
+
+```
+
+---
+
+# seed.js (2/2)
+
+```js
+
+module.exports = async function ({ entities, db, sql }) {
+  for (const values of quotes) {
+    const movie = await entities.movie.save({ input: { name: values.movie } })
+
+    console.log('Created movie:', movie)
+
+    const quote = {
+      quote: values.quote,
+      saidBy: values.saidBy,
+      movieId: movie.id
+    }
+
+    await entities.quote.save({ input: quote })
+
+    console.log('Created quote:', quote)
+  }
+}
+
+```
+
+---
+
+# Step 4: apply the seed
+- We need to remove the db first: 
+```shell 
+rm db.sqlite
+```
+- Then run migrations: 
+```shell
+npm run db migrate
+```
+- ...and the seed: 
+```shell
+npm run db seed seed.js
+```

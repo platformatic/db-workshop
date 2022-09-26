@@ -1,0 +1,160 @@
+type Query {
+  getQuoteById(id: ID!): Quote
+  quotes(limit: Int, offset: Int, orderBy: [QuoteOrderByArguments], where: QuoteWhereArguments): [Quote]
+  getMovieById(id: ID!): Movie
+  movies(limit: Int, offset: Int, orderBy: [MovieOrderByArguments], where: MovieWhereArguments): [Movie]
+}
+
+type Quote {
+  id: ID
+  quote: String
+  saidBy: String
+  createdAt: String
+  movie: Movie
+}
+
+type Movie {
+  id: ID
+  name: String
+  quotes(limit: Int, offset: Int, orderBy: [QuoteOrderByArguments], where: QuoteWhereArguments): [Quote]
+}
+
+input QuoteOrderByArguments {
+  field: QuoteOrderByField
+  direction: OrderByDirection!
+}
+
+enum QuoteOrderByField {
+  id
+  quote
+  saidBy
+  createdAt
+  movieId
+}
+
+enum OrderByDirection {
+  ASC
+  DESC
+}
+
+input QuoteWhereArguments {
+  id: QuoteWhereArgumentsid
+  quote: QuoteWhereArgumentsquote
+  saidBy: QuoteWhereArgumentssaidBy
+  createdAt: QuoteWhereArgumentscreatedAt
+  movieId: QuoteWhereArgumentsmovieId
+}
+
+input QuoteWhereArgumentsid {
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  in: [ID]
+  nin: [ID]
+}
+
+input QuoteWhereArgumentsquote {
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  in: [String]
+  nin: [String]
+}
+
+input QuoteWhereArgumentssaidBy {
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  in: [String]
+  nin: [String]
+}
+
+input QuoteWhereArgumentscreatedAt {
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  in: [String]
+  nin: [String]
+}
+
+input QuoteWhereArgumentsmovieId {
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  in: [ID]
+  nin: [ID]
+}
+
+input MovieOrderByArguments {
+  field: MovieOrderByField
+  direction: OrderByDirection!
+}
+
+enum MovieOrderByField {
+  id
+  name
+}
+
+input MovieWhereArguments {
+  id: MovieWhereArgumentsid
+  name: MovieWhereArgumentsname
+}
+
+input MovieWhereArgumentsid {
+  eq: ID
+  neq: ID
+  gt: ID
+  gte: ID
+  lt: ID
+  lte: ID
+  in: [ID]
+  nin: [ID]
+}
+
+input MovieWhereArgumentsname {
+  eq: String
+  neq: String
+  gt: String
+  gte: String
+  lt: String
+  lte: String
+  in: [String]
+  nin: [String]
+}
+
+type Mutation {
+  saveQuote(input: QuoteInput!): Quote
+  insertQuotes(inputs: [QuoteInput]!): [Quote]
+  deleteQuotes(where: QuoteWhereArguments): [Quote]
+  saveMovie(input: MovieInput!): Movie
+  insertMovies(inputs: [MovieInput]!): [Movie]
+  deleteMovies(where: MovieWhereArguments): [Movie]
+}
+
+input QuoteInput {
+  id: ID
+  quote: String
+  saidBy: String
+  createdAt: String
+  movieId: ID
+}
+
+input MovieInput {
+  id: ID
+  name: String
+}

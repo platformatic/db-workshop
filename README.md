@@ -15,4 +15,4 @@
 - A code editor, for example [Visual Studio Code](https://code.visualstudio.com/)
  
 ## Theme
-This presentation uses `slidev-theme-platforamtic`. If not available on `npm` repository, clone it and then `npm link` it. 
+This presentation uses `slidev-theme-platformatic`. If not available on `npm` repository, clone it and then `npm link` it. 

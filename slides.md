@@ -562,4 +562,5 @@ module.exports = async function plugin (app) {
 }
 
 ```
+
 - Try the mutation with GraphiQL

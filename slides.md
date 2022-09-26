@@ -1,9 +1,11 @@
 ---
-theme: default
+theme: slidev-theme-platformatic
 highlighter: shiki
 lineNumbers: true
-favicon: './assets/favicon.ico'
-align: 'center'
+favicon: ./assets/favicon.ico
+align: center
+title: Introducing Platformatic DB
+layout: cover
 ---
 
 # Introducing Platformatic DB
@@ -11,11 +13,9 @@ align: 'center'
 <img src="/assets/plt-logo.svg" width="200" height="200" class="center">
 NodeConf.eu 2022
 
-<div class="pt-12">
-  <span @click="$slidev.nav.next" class="px-2 py-1 rounded cursor-pointer" hover="bg-white bg-opacity-10">
-    Press Space&nbsp;<carbon:arrow-right class="inline"/>
-  </span>
-</div>
+
+<div class="logo" />
+
 
 <div class="abs-br m-6 flex gap-2">
   <a href="https://github.com/platformatic/platformatic" target="_blank" alt="GitHub"
@@ -25,7 +25,7 @@ NodeConf.eu 2022
 </div>
 
 <!--
-Do we need the NodeConf logo?
+Do we need the NodeConf logo
 -->
 
 ---
@@ -110,18 +110,20 @@ cd movie-quotes/apps/movie-quotes-api/
 npm init --yes
 npm install platformatic
 npm pkg set scripts.db="platformatic db"
-npm pkg set scripts.start="npm run db -- start"
+npm pkg set scripts.start="npm run db start"
 npm pkg set scripts.dev="npm start"
 
 ```
 
+---
+layout: two-cols
 ---
 
 # Step 1: Initial Setup 2/2
 - Init **platformatic.db**:
 
 ```shell
-npm run db -- init
+npm run db init
 
 ```
 
@@ -131,12 +133,20 @@ npm run db -- init
 npm start
 
 ```
+::right::
 
-<img src="/assets/step-1-run.png" width="350" class="center">
+<img src="/assets/step-2-run.png" width="350" class="center">
+
+<!--
+I prefer to use`db --init` instead of having people trying to copy a base configuration(which is time consuming and error-prone)
+-->
+
 ---
+layout: two-cols
+---
+## Open and check the created **platformatic.db.json** 
 
-# Check Platformatic Configuration
-- Open and check the created **platformatic.db.json** 
+::right::
 ```json
 {
   "server": {
@@ -208,15 +218,26 @@ Platformatic is now exposing the 'quotes' entity through GraphQL and OpenAPI!
  
 ---
 
-# Check Graphiql and OpenApi
+# GraphiQL
 
-- http://localhost:3042/graphiql
+http://localhost:3042/graphiql
 
-<img src="/assets/step-2-graphiql.png" width="350" class="center">
 
-- http://localhost:3042/documentation/static/index.html
 
-<img src="/assets/step-2-openapi.png" width="300" class="center">
+<img src="/assets/step-2-graphiql.png" width="600" class="right">
+<!--
+TODO: fix layout and image size
+-->
+
+---
+
+
+# OpenApi
+
+http://localhost:3042/documentation/static/index.html
+
+<img src="/assets/step-2-openapi.png" width="500" class="left">
+
 <!--
 TODO: fix layout and image size
 -->
@@ -245,7 +266,38 @@ ALTER TABLE quotes ADD COLUMN movie_id INTEGER REFERENCES movies(id);
 
 # Step 3: Add Relationship 
 
-[TODO] insert data with graphiql
+Open GraphiQL and try to create a movie:
+
+```graphql
+mutation {
+  saveMovie(input: { name: "The Wizard of Oz" }) {
+    id
+  }
+}
+
+```
+And (assuming `movieId` is 1): 
+
+```graphql
+mutation {
+  saveQuote(
+    input: {
+      quote: "Toto, I've got a feeling we're not in Kansas anymore", 
+      movieId: 1, 
+      saidBy: "Dorothy Gale"}
+  ) {
+    id
+    quote
+  }
+}
+```
+
+---
+
+# Step 3
+
+Query data
+<img src="/assets/step-3-query.png" width="600" class="left">
 
 
 ---
@@ -253,7 +305,7 @@ ALTER TABLE quotes ADD COLUMN movie_id INTEGER REFERENCES movies(id);
 # BONUS: Get GraphQL schema
 
 ```shell
-npx platformatic db schema graphql >> schema.sdl
+npm run db schema graphql >> schema.sdl
 
 cat schema.sdl     
 type Query {
@@ -284,5 +336,3 @@ type Movie {
 # Step 4: Seed the Database
 
 [TODO]
-
-

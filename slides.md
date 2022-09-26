@@ -25,7 +25,7 @@ NodeConf.eu 2022
 </div>
 
 <!--
-Do we need the NodeConf logo
+Do we need the NodeConf logo?
 -->
 
 ---
@@ -351,6 +351,10 @@ module.exports = async function ({ entities, db, sql }) {
 
 ```
 
+<!--
+Maybe we can skip the "seed" part
+-->
+
 ---
 
 # seed.js (1/2)
@@ -423,3 +427,139 @@ npm run db migrate
 ```shell
 npm run db seed seed.js
 ```
+
+---
+
+# Step 5: Build a "like" quote feature
+
+- Create and apply this migration: 
+```sql
+ALTER TABLE quotes ADD COLUMN likes INTEGER default 0;
+```
+
+- Create `plugin.js`:
+
+```js
+module.exports = async function plugin (app) {
+  app.log.info('plugin loaded')
+}
+```
+
+- ...and setup in `platformatic.db.json`:
+
+```json{6-8}
+{
+  ...
+  "migrations": {
+    "dir": "./migrations"
+  },
+  "plugin": {
+    "path": "./plugin.js"
+  }
+}
+
+```
+<!--
+I think we should do this before moving to UI, because otherwise the risk is that we don't have time to show how to extend Platformatic DB. 
+Also, people should do the migration and apply by themselves (they already have all the info)
+-->
+
+---
+
+# Step 5: Plugins 
+
+- Platformatic DB can be extended with **Fastify Plugins**
+- When starting, plugins are loaded: 
+
+```shell {2}
+[10:09:20.052] INFO (146270): running 003.do.sql
+[10:09:20.129] INFO (146270): plugin loaded
+[10:09:20.209] INFO (146270): server listening
+    url: "http://127.0.0.1:3042"
+```
+
+--- 
+
+- Install `npm i fluent-json-schema`
+
+- ...use it:
+
+```js {1,5-17}
+const S = require('fluent-json-schema')
+module.exports = async function plugin (app) {
+  app.log.info('plugin loaded')
+
+  const schema = {
+    params: S.object().prop('id', app.getSchema('Quote').properties.id)
+  }
+
+  app.post('/quotes/:id/like', { schema }, async function (request, response) {
+    const { db, sql } = app.platformatic
+
+    const result = await db.query(sql`
+      UPDATE quotes SET likes = likes + 1 WHERE id=${request.params.id} RETURNING likes
+    `)
+
+    return result[0]?.likes
+  })
+}
+
+```
+
+`curl --request POST http://localhost:3042/quotes/1/like`
+
+
+---
+
+# Step 6: `likeQuote` mutation
+
+- We can refactor out a `incrementQuoteLikes` from reuse: 
+
+```js{6-14,19-21} 
+const S = require('fluent-json-schema')
+module.exports = async function plugin (app) {
+  app.log.info('plugin loaded')
+
+  async function incrementQuoteLikes (id) {
+    const { db, sql } = app.platformatic
+
+    const result = await db.query(sql`
+      UPDATE quotes SET likes = likes + 1 WHERE id=${id} RETURNING likes
+    `)
+
+    return result[0]?.likes
+  }
+  const schema = {
+    params: S.object().prop('id', app.getSchema('Quote').properties.id)
+  }
+
+  app.post('/quotes/:id/like', { schema }, async function (request, response) {
+    return { likes: await incrementQuoteLikes(request.params.id) }
+  })
+}
+```
+
+--- 
+
+# Add the resolver
+
+```js {5-15}
+
+module.exports = async function plugin (app) {
+  // ...
+
+  app.graphql.extendSchema(`
+    extend type Mutation {
+      likeQuote(id: ID!): Int
+    }
+  `)
+
+  app.graphql.defineResolvers({
+    Mutation: {
+      likeQuote: async (_, { id }) => await incrementQuoteLikes(id)
+    }
+  })
+}
+
+```
+- Try the mutation with GraphiQL

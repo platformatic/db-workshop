@@ -1,5 +1,5 @@
 ---
-theme: slidev-theme-platformatic
+theme: ../slidev-theme-platformatic
 highlighter: shiki
 lineNumbers: true
 favicon: ./assets/favicon.ico
@@ -10,19 +10,10 @@ layout: cover
 
 # Introducing Platformatic DB
 
-<img src="/assets/plt-logo.svg" width="200" height="200" class="center">
+<div class="logo" />
 NodeConf.eu 2022
 
 
-<div class="logo" />
-
-
-<div class="abs-br m-6 flex gap-2">
-  <a href="https://github.com/platformatic/platformatic" target="_blank" alt="GitHub"
-    class="text-xl icon-btn opacity-50 !border-none !hover:text-white">
-    <carbon-logo-github />
-  </a>
-</div>
 
 <!--
 Do we need the NodeConf logo?
@@ -123,8 +114,7 @@ layout: two-cols
 - Init **platformatic.db**:
 
 ```shell
-npm run db init
-
+npx platformatic db init
 ```
 
 - Start **platformatic.db**:
@@ -142,17 +132,12 @@ I prefer to use`db --init` instead of having people trying to copy a base config
 -->
 
 ---
-layout: two-cols
----
-## Open and check the created **platformatic.db.json** 
 
-::right::
+# Open and check the created **platformatic.db.json** 
+
 ```json
 {
   "server": {
-    "logger": {
-      "level": "info"
-    },
     "hostname": "127.0.0.1",
     "port": 3042
   },
@@ -171,14 +156,19 @@ layout: two-cols
 
 <!--
 Here we can add, as `bonus` to use `.env`
+TODO: remove from `db init` and logger info
 -->
 ---
 
-# Bonus - Use `.env`
+# Use `.env`
 
-[TODO]
+[TODO] 
 
-
+<!-- 
+All variables MUST be prefixed with PLT_ 
+ then: 
+"connectionString": "{PLT_DATABASE_URL}"
+-->
 ---
 
 
@@ -201,6 +191,10 @@ CREATE TABLE quotes (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+<!--
+Migrate back (you can delete the file too) 
+-->
 
 - Run platformatic db again: 
 ```shell
@@ -296,7 +290,8 @@ mutation {
 
 # Step 3
 
-Query data
+- Query data
+
 <img src="/assets/step-3-query.png" width="600" class="left">
 
 
@@ -305,7 +300,7 @@ Query data
 # BONUS: Get GraphQL schema
 
 ```shell
-npm run db schema graphql >> schema.sdl
+npx platformatic db schema graphql >> schema.sdl
 
 cat schema.sdl     
 type Query {
@@ -331,6 +326,10 @@ type Movie {
 (...)
 ```
 
+<!-- 
+Link to generators from schema 
+-->
+
 ---
 
 # Step 4: Seed the Database
@@ -352,7 +351,7 @@ module.exports = async function ({ entities, db, sql }) {
 ```
 
 <!--
-Maybe we can skip the "seed" part
+TODO: link to atdatabases
 -->
 
 ---
@@ -425,7 +424,7 @@ npm run db migrate
 ```
 - ...and the seed: 
 ```shell
-npm run db seed seed.js
+npx platformatic db seed seed.js
 ```
 
 ---
@@ -478,7 +477,11 @@ Also, people should do the migration and apply by themselves (they already have 
     url: "http://127.0.0.1:3042"
 ```
 
---- 
+<!--
+TODO: add link
+-->
+
+---
 
 - Install `npm i fluent-json-schema`
 
@@ -513,9 +516,9 @@ module.exports = async function plugin (app) {
 
 # Step 6: `likeQuote` mutation
 
-- We can refactor out a `incrementQuoteLikes` from reuse: 
+- We can refactor out a `incrementQuoteLikes` for reuse: 
 
-```js{6-14,19-21} 
+```js{5-13,18-20} 
 const S = require('fluent-json-schema')
 module.exports = async function plugin (app) {
   app.log.info('plugin loaded')
@@ -539,9 +542,13 @@ module.exports = async function plugin (app) {
 }
 ```
 
---- 
+<!--
+Fix higlight
+-->
 
-# Add the resolver
+---
+
+# Add the resolver:
 
 ```js {5-15}
 
@@ -564,3 +571,73 @@ module.exports = async function plugin (app) {
 ```
 
 - Try the mutation with GraphiQL
+
+---
+
+# Step 7: Setup UI
+
+- Copy from `./steps/07-ui/movie-quotes/apps/movie-quotes-frontend`
+- On server setup CORS in `platformatic.db.json`:
+
+
+```json{5-7}
+{
+  "server": {
+    "hostname": "127.0.0.1",
+    "port": 3042
+    "cors": {
+      "origin": "http://localhost:3000"
+    }
+  },
+  ...
+}
+```
+
+- Restart the server
+
+
+<!--
+BONUS STEP.
+ The presenter must have all running on the laptop.
+-->
+
+---
+layout: two-cols
+---
+
+# Run UI 
+
+- In the ui folder, run:
+```shell
+npm install
+npm start
+```
+
+- Open with the browser: `http://localhost:3000`
+
+::right::
+
+<img src="/assets/step-7-ui.png" width="350" class="center">
+
+---
+
+# Next Steps 
+
+[TODO]
+
+---
+
+# Thanks!!!!! 👋
+
+[TODO]
+
+<div>
+  <a href="https://github.com/platformatic/platformatic" target="_blank" alt="GitHub"
+    class="text-xl icon-btn opacity-50 !border-none !hover:text-white">
+    <carbon-logo-github />
+  </a>
+</div>
+
+
+
+

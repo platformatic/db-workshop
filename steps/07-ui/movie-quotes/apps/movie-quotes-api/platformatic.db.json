@@ -4,7 +4,10 @@
       "level": "info"
     },
     "hostname": "127.0.0.1",
-    "port": "3042"
+    "port": "3042",
+    "cors": {
+      "origin": "http://localhost:3000"
+    }
   },
   "core": {
     "connectionString": "sqlite://db.sqlite",
@@ -19,5 +22,8 @@
   },
   "types": {
     "autogenerate": true
+  },
+  "plugin": {
+    "path": "./plugin.js"
   }
 }

@@ -1,0 +1,19 @@
+{
+  "name": "movie-quotes-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db": "platformatic db",
+    "start": "npm run db -- start",
+    "dev": "npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fluent-json-schema": "^3.1.0",
+    "platformatic": "^0.1.0"
+  }
+}

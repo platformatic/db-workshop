@@ -1,6 +1,6 @@
 ---
 theme: ../slidev-theme-platformatic
-highlighter: shiki
+highlighter: prism
 lineNumbers: true
 favicon: ./assets/favicon.ico
 align: center
@@ -14,7 +14,6 @@ layout: cover
 NodeConf.eu 2022
 
 
-
 <!--
 Do we need the NodeConf logo?
 -->
@@ -23,38 +22,22 @@ Do we need the NodeConf logo?
 
 # What is Platformatic DB?
 
-
 Platformatic DB allows you to:
 
-- Create both OpenAPI and GraphQL schemas from your database, without having to write a single line of code. 
-- All customizable via Node.js and Fastify plugins.
+- Create both [**OpenAPI**](https://www.openapis.org) and [**GraphQL**](https://graphql.org) schemas from your database, without having to write a single line of code. 
+- All customizable via [**Nodejs**](https://nodejs.org) and [**Fastify**](https://www.fastify.io/) plugins.
 
 <br>
-<br>
+
+## More Features
+
+- Multiple databases supported: SQLite, MySQL, MariaDB, PostgreSQL
+- Multiple authentication methods: JWT, WebHook, HTTP Headers
+- Authorization via role based access control
 
 Read more about [Platformatic](https://oss.platformatic.dev/)
 
-<!--
-just a draft
--->
 
----
-
-# Features
-
-- Automatic OpenAPI/REST API generation
-- Automatic GraphQL API generation
-- Multiple databases: SQLite, MySQL, MariaDB, PostgreSQL
-- Multiple authentication methods: JWT, WebHook, HTTP Headers
-- Authorization via role based access control
-- Customizable via Node.js and [Fastify](https://www.fastify.io/) plugins
-
-<br>
-<br>
-
-<!--
-just a draft
--->
 ---
 
 ## Requirements
@@ -64,46 +47,46 @@ just a draft
 - A code editor, for example [Visual Studio Code](https://code.visualstudio.com/)
 - Basic knowledge of GraphQL
 
+<br>
+
 ## Setup
 
-```bash
+```shell
 git clone https://github.com/platformatic/platformatic-db-workshop
 npm ci
 
 ```
 
-## 
-
-<br>
-<br>
-
 ---
 
-# Workshop Structure
+## Workshop Structure
 
 - Every step is incremental
-- The final state of the n-th step is in `steps/step-{n}`
+- The **final** state of the n-th step is in `steps/step-{n}`.
+- We will build a full working backend for a "Movie Quotes App"
 
 ---
 
 # Step 1: Initial Setup 1/2 
 
 - Create a folder for the project and the backend:
-```shell {1|3|all}
+```shell
 mkdir -p movie-quotes/apps/movie-quotes-api/
+```
 
+- `cd` into it: 
+
+```shell
 cd movie-quotes/apps/movie-quotes-api/
 
 ```
 
 - init `npm` and install platformatic:
-```shell {1|2|3-5|all}
+```shell {1|2|3-4|all}
 npm init --yes
 npm install platformatic
-npm pkg set scripts.db="platformatic db"
-npm pkg set scripts.start="npm run db start"
+npm pkg set scripts.start="platformatic db start"
 npm pkg set scripts.dev="npm start"
-
 ```
 
 ---
@@ -128,12 +111,11 @@ npm start
 <img src="/assets/step-2-run.png" width="350" class="center">
 
 <!--
-I prefer to use`db --init` instead of having people trying to copy a base configuration(which is time consuming and error-prone)
 -->
 
 ---
 
-# Open and check the created **platformatic.db.json** 
+# Check the created **platformatic.db.json** 
 
 ```json
 {
@@ -154,35 +136,62 @@ I prefer to use`db --init` instead of having people trying to copy a base config
 }
 ```
 
-<!--
-Here we can add, as `bonus` to use `.env`
-TODO: remove from `db init` and logger info
--->
+It's possible to use env variables too for the configuration values (next slide)
+
+
+---
+layout: two-cols 
 ---
 
-# Use `.env`
+- #### All variables MUST be prefixed with `PLT_` 
+- #### ...with some (configurable) exceptions:
+  #### ([ 'PORT', 'DATABASE_URL' ])
+- #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information 
 
-[TODO] 
+::right::
 
-<!-- 
-All variables MUST be prefixed with PLT_ 
- then: 
-"connectionString": "{PLT_DATABASE_URL}"
--->
----
+## `platformatic.db.json`
+```json
+{
+  "server": {
+    "logger": {
+      "level": "{PLT_SERVER_LOGGER_LEVEL}"
+    },
+    "hostname": "{PLT_SERVER_HOSTNAME}",
+    "port": "{PORT}"
+  },
+  "core": {
+    "connectionString": "{DATABASE_URL}"
+  },
+  "migrations": {
+    "dir": "./migrations"
+  }
+}
 
-
-# Step 2: Create DB schema (1/2)
-
-- Remove `db.sqlite`:
-```shell
-rm db.sqlite
 ```
 
-The reason is that this has been created by default migrations created with `platformatic db init`. Now we want to specify our own DB schema.
+## `.env`
+```shell
+PORT=3042
+PLT_SERVER_HOSTNAME=127.0.0.1
+PLT_SERVER_LOGGER_LEVEL=info
+DATABASE_URL=sqlite://./movie-quotes.sqlite
+```
 
+---
 
-- Edit `./migrations/001.do.sql` to be just:
+# Step 2: Create DB schema (1/3)
+
+- Migrate `db.sqlite` back (or you can remove the `db.sqlite` file):
+```shell
+npx platformatic db migrate --to 000
+```
+
+- The reason is that this has been created by default migrations created with `platformatic db init`. 
+
+- Now we want to specify our own DB schema.
+
+- Edit `./migrations/001.do.sql` to be:
 ```sql
 CREATE TABLE quotes (
   id INTEGER PRIMARY KEY,
@@ -193,16 +202,24 @@ CREATE TABLE quotes (
 ```
 
 <!--
-Migrate back (you can delete the file too) 
+NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https://github.com/platformatic/platformatic/issues/44 
 -->
+---
 
-- Run platformatic db again: 
+# Step 2: Create DB schema (2/3)
+- Remember to change `001.undo.sql` too:
+
+```sql 
+
+DROP TABLE quotes;
+```
+- Then, run platformatic db again: 
 ```shell
 npm run dev
 ```
 ---
 
-# Step 2: Create DB schema (2/2) 
+# Step 2: Create DB schema (3/3) 
 
 - Note that migration `001.do.sql` is applied: 
 
@@ -239,7 +256,7 @@ TODO: fix layout and image size
 
 # Step 3: Add Relationship 
 
-- Create **./migrations/002.do.sql**:
+- Create `./migrations/002.do.sql`:
 ```sql
 CREATE TABLE movies (
   id INTEGER PRIMARY KEY,
@@ -247,6 +264,13 @@ CREATE TABLE movies (
 );
 
 ALTER TABLE quotes ADD COLUMN movie_id INTEGER REFERENCES movies(id);
+```
+
+- ...and `002.undo.sql`:
+
+```sql
+ALTER TABLE quotes DROP COLUMN movie_id;
+DROP TABLE movies;
 ```
 
 - Stop and start Platformatic DB:
@@ -299,9 +323,14 @@ mutation {
 
 # BONUS: Get GraphQL schema
 
+- The GraphQL schema can be extracted with:
+
 ```shell
 npx platformatic db schema graphql >> schema.sdl
 
+```
+
+```shell
 cat schema.sdl     
 type Query {
   getQuoteById(id: ID!): Quote
@@ -309,22 +338,12 @@ type Query {
   getMovieById(id: ID!): Movie
   movies(limit: Int, offset: Int, orderBy: [MovieOrderByArguments], where: MovieWhereArguments): [Movie]
 }
-
-type Quote {
-  id: ID
-  quote: String
-  saidBy: String
-  createdAt: String
-  movie: Movie
-}
-
-type Movie {
-  id: ID
-  name: String
-  quotes(limit: Int, offset: Int, orderBy: [QuoteOrderByArguments], where: QuoteWhereArguments): [Quote]
-}
 (...)
 ```
+
+- Some code generators that can process it:
+  - https://www.the-guild.dev/graphql/codegen
+  - https://github.com/apollographql/apollo-tooling
 
 <!-- 
 Link to generators from schema 
@@ -334,26 +353,23 @@ Link to generators from schema
 
 # Step 4: Seed the Database
 
-- The `platformatic db seed` command allow to run a script that populates the DB.
-- `seed.js` needs to export a function: 
-
+- #### The `platformatic db seed` command allow to run a script that populates the DB.
+- #### The script needs to export a function: 
 
 ```js
 'use strict'
-
 module.exports = async function ({ entities, db, sql }) {
   await entities.graph.save({ input: { name: 'Hello' } })
   await db.query(sql`
     INSERT INTO graphs (name) VALUES ('Hello 2');
   `)
 }
-
 ```
 
-<!--
-TODO: link to atdatabases
--->
-
+- #### Where:
+  - #### `db` - A database abstraction layer from [@databases](https://www.atdatabases.org/)
+  - #### `sql` - The SQL builder from [@databases](https://www.atdatabases.org/)
+  - #### `entities` - An object containing a key for each table found in the schema, with basic CRUD operations.
 ---
 
 # seed.js (1/2)
@@ -414,9 +430,9 @@ module.exports = async function ({ entities, db, sql }) {
 ---
 
 # Step 4: apply the seed
-- We need to remove the db first: 
-```shell 
-rm db.sqlite
+- We need to reset the db first (removing `db.sqlite` also works): 
+```shell
+npx platformatic db migrate --to 000
 ```
 - Then run migrations: 
 ```shell
@@ -431,7 +447,7 @@ npx platformatic db seed seed.js
 
 # Step 5: Build a "like" quote feature
 
-- Create and apply this migration: 
+- Create and apply this migration (remember the `undo` script): 
 ```sql
 ALTER TABLE quotes ADD COLUMN likes INTEGER default 0;
 ```
@@ -444,7 +460,7 @@ module.exports = async function plugin (app) {
 }
 ```
 
-- ...and setup in `platformatic.db.json`:
+- ...and set it up in `platformatic.db.json`:
 
 ```json{6-8}
 {
@@ -458,17 +474,13 @@ module.exports = async function plugin (app) {
 }
 
 ```
-<!--
-I think we should do this before moving to UI, because otherwise the risk is that we don't have time to show how to extend Platformatic DB. 
-Also, people should do the migration and apply by themselves (they already have all the info)
--->
 
 ---
 
 # Step 5: Plugins 
 
-- Platformatic DB can be extended with **Fastify Plugins**
-- When starting, plugins are loaded: 
+- Platformatic DB can be extended with [**Fastify Plugins**](https://www.fastify.io/docs/latest/Reference/Plugins/)
+- When Platformatic DB starts, loads the plugins: 
 
 ```shell {2}
 [10:09:20.052] INFO (146270): running 003.do.sql
@@ -477,15 +489,12 @@ Also, people should do the migration and apply by themselves (they already have 
     url: "http://127.0.0.1:3042"
 ```
 
-<!--
-TODO: add link
--->
-
 ---
 
-- Install `npm i fluent-json-schema`
-
-- ...use it:
+ 
+## "like quote" with REST 
+- #### Install `npm i fluent-json-schema`
+- #### ...use it:
 
 ```js {1,5-17}
 const S = require('fluent-json-schema')
@@ -509,14 +518,13 @@ module.exports = async function plugin (app) {
 
 ```
 
-`curl --request POST http://localhost:3042/quotes/1/like`
-
+#### `curl --request POST http://localhost:3042/quotes/1/like`
 
 ---
 
 # Step 6: `likeQuote` mutation
 
-- We can refactor out a `incrementQuoteLikes` for reuse: 
+- We can extract a `incrementQuoteLikes` function for reuse in `plugin.js`: 
 
 ```js{5-13,18-20} 
 const S = require('fluent-json-schema')
@@ -541,10 +549,6 @@ module.exports = async function plugin (app) {
   })
 }
 ```
-
-<!--
-Fix higlight
--->
 
 ---
 
@@ -595,7 +599,6 @@ module.exports = async function plugin (app) {
 
 - Restart the server
 
-
 <!--
 BONUS STEP.
  The presenter must have all running on the laptop.
@@ -623,21 +626,22 @@ npm start
 
 # Next Steps 
 
-[TODO]
+- Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://oss.platformatic.dev/docs/next/guides/jwt-auth0)).
+- Add authorizations at API level (see [references](https://oss.platformatic.dev/docs/next/reference/db-authorization/introduction))
+- Generate [TypeScript](https://www.typescriptlang.org/) types 
+
+<!-- 
+Other??
+-->
 
 ---
 
 # Thanks!!!!! 👋
 
-[TODO]
+<div class="logo" /> 
 
-<div>
-  <a href="https://github.com/platformatic/platformatic" target="_blank" alt="GitHub"
-    class="text-xl icon-btn opacity-50 !border-none !hover:text-white">
-    <carbon-logo-github />
-  </a>
-</div>
-
-
-
-
+- https://oss.platformatic.dev/
+- https://blog.platformatic.dev/
+- <carbon-logo-github /> https://github.com/platformatic
+- <carbon-logo-discord /> https://discord.gg/platformatic 
+- <carbon-logo-twitter /> https://twitter.com/platformatic

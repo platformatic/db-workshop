@@ -4,14 +4,18 @@
       "level": "info"
     },
     "hostname": "127.0.0.1",
-    "port": 3042
+    "port": "3042"
   },
   "core": {
-    "connectionString": "sqlite://./db.sqlite",
-    "graphiql": true
+    "connectionString": "sqlite://db.sqlite",
+    "graphiql": true,
+    "ignore": {
+      "versions": true
+    }
   },
   "migrations": {
-    "dir": "./migrations"
+    "dir": "migrations",
+    "table": "versions"
   },
   "types": {
     "autogenerate": true

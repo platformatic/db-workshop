@@ -15,4 +15,4 @@
 - A code editor, for example [Visual Studio Code](https://code.visualstudio.com/)
  
 ## Theme
-This presentation uses `slidev-theme-platformatic`. Please clone it aside this project (theme is referred as `theme: ../slidev-theme-platformatic`).
+This presentation uses `slidev-theme-platformatic`. 

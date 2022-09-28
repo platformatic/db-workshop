@@ -1,5 +1,5 @@
 ---
-theme: ../slidev-theme-platformatic
+theme: platformatic
 highlighter: prism
 lineNumbers: true
 favicon: ./assets/favicon.ico

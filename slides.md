@@ -86,7 +86,6 @@ cd movie-quotes/apps/movie-quotes-api/
 npm init --yes
 npm install platformatic
 npm pkg set scripts.start="platformatic db start"
-npm pkg set scripts.dev="npm start"
 ```
 
 ---
@@ -145,7 +144,7 @@ layout: two-cols
 
 - #### All variables MUST be prefixed with `PLT_` 
 - #### ...with some (configurable) exceptions:
-  #### ([ 'PORT', 'DATABASE_URL' ])
+  #### (`['PORT', 'DATABASE_URL']`)
 - #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information 
 
 ::right::
@@ -213,9 +212,9 @@ NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https:
 
 DROP TABLE quotes;
 ```
-- Then, run platformatic db again: 
+- Then, stop and run Platformatic DB again: 
 ```shell
-npm run dev
+npm start
 ```
 ---
 
@@ -236,12 +235,9 @@ http://localhost:3042/graphiql
 
 
 <img src="/assets/step-2-graphiql.png" width="600" class="right">
-<!--
-TODO: fix layout and image size
--->
+
 
 ---
-
 
 # OpenApi
 
@@ -249,9 +245,7 @@ http://localhost:3042/documentation/static/index.html
 
 <img src="/assets/step-2-openapi.png" width="500" class="left">
 
-<!--
-TODO: fix layout and image size
--->
+
 ---
 
 # Step 3: Add Relationship 
@@ -430,15 +424,17 @@ module.exports = async function ({ entities, db, sql }) {
 ---
 
 # Step 4: apply the seed
-- We need to reset the db first (removing `db.sqlite` also works): 
+- To start from a clean slate, we need to reset the db first, so we can migrate to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works. 
 ```shell
 npx platformatic db migrate --to 000
 ```
+
 - Then run migrations: 
 ```shell
-npm run db migrate
+npx platformatic db migrate
 ```
-- ...and the seed: 
+
+- ...and seed: 
 ```shell
 npx platformatic db seed seed.js
 ```
@@ -452,7 +448,7 @@ npx platformatic db seed seed.js
 ALTER TABLE quotes ADD COLUMN likes INTEGER default 0;
 ```
 
-- Create `plugin.js`:
+- Check `plugin.js`:
 
 ```js
 module.exports = async function plugin (app) {
@@ -460,7 +456,7 @@ module.exports = async function plugin (app) {
 }
 ```
 
-- ...and set it up in `platformatic.db.json`:
+- ...and the configuration in `platformatic.db.json`:
 
 ```json{6-8}
 {
@@ -474,6 +470,11 @@ module.exports = async function plugin (app) {
 }
 
 ```
+
+<!-- 
+Here we will have plugin.js and config that are generated on the first migration (instead of during `init`). 
+See: https://github.com/platformatic/platformatic/issues/55
+-->
 
 ---
 
@@ -494,7 +495,8 @@ module.exports = async function plugin (app) {
  
 ## "like quote" with REST 
 - #### Install `npm i fluent-json-schema`
-- #### ...use it:
+- #### ...use it in `plugin.js`:
+
 
 ```js {1,5-17}
 const S = require('fluent-json-schema')
@@ -552,7 +554,7 @@ module.exports = async function plugin (app) {
 
 ---
 
-# Add the resolver:
+# Add a GraphQL Resolver for incrementing likes
 
 ```js {5-15}
 
@@ -581,7 +583,33 @@ module.exports = async function plugin (app) {
 # Step 7: Setup UI
 
 - Copy from `./steps/07-ui/movie-quotes/apps/movie-quotes-frontend`
-- On server setup CORS in `platformatic.db.json`:
+
+- In the frontend folder, run:
+```shell
+npm install
+npm start
+```
+
+This should start: 
+```shell {8}
+➜ npm start  
+
+> start
+> astro dev --port 3000
+
+  🚀  astro  v1.3.1 started in 38ms
+  
+  ┃ Local    http://localhost:3000/
+  ┃ Network  use --host to expose
+```
+<!--
+Apparently, `vite` starts on http://localhost:3000/ on linux, and  http://127.0.0.1:3000/ on others
+-->
+---
+
+# Step 7: Setup CORS
+
+- On server setup CORS in `platformatic.db.json` using the same local URL:
 
 
 ```json{5-7}
@@ -597,7 +625,7 @@ module.exports = async function plugin (app) {
 }
 ```
 
-- Restart the server
+- Restart the Platformatic DB server
 
 <!--
 BONUS STEP.
@@ -608,19 +636,11 @@ BONUS STEP.
 layout: two-cols
 ---
 
-# Run UI 
 
-- In the ui folder, run:
-```shell
-npm install
-npm start
-```
-
-- Open with the browser: `http://localhost:3000`
+# Open with the browser 
 
 ::right::
-
-<img src="/assets/step-7-ui.png" width="350" class="center">
+<img src="/assets/step-7-ui.png" width="400" class="center">
 
 ---
 
@@ -631,7 +651,7 @@ npm start
 - Generate [TypeScript](https://www.typescriptlang.org/) types 
 
 <!-- 
-Other??
+Others??
 -->
 
 ---

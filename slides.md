@@ -13,6 +13,7 @@ layout: cover
 <div class="logo" />
 NodeConf.eu 2022
 
+[https://platformatic.dev/db-workshop](https://platformatic.dev/db-workshop)
 
 <!--
 Do we need the NodeConf logo?

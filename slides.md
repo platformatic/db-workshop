@@ -52,7 +52,7 @@ Read more about [Platformatic](https://oss.platformatic.dev/)
 ## Setup
 
 ```shell
-git clone https://github.com/platformatic/platformatic-db-workshop
+git clone https://github.com/platformatic/db-workshop.git
 
 ```
 

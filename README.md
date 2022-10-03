@@ -6,7 +6,7 @@
 
 ## Slideshow Presentation
 
-[The Platformatic DB Workshop Slides](https://github.io/platformatic/platformatic-db-workshop)
+[The Platformatic DB Workshop Slides](https://platformatic.dev/db-workshop)
 
 ## Requirements
 

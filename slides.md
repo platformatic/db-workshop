@@ -53,10 +53,12 @@ Read more about [Platformatic](https://oss.platformatic.dev/)
 
 ```shell
 git clone https://github.com/platformatic/platformatic-db-workshop
-npm ci
 
 ```
 
+<!---
+We don't need to npm install because they just need the steps
+-->
 ---
 
 ## Workshop Structure
@@ -183,7 +185,7 @@ DATABASE_URL=sqlite://./movie-quotes.sqlite
 
 - Migrate `db.sqlite` back (or you can remove the `db.sqlite` file):
 ```shell
-npx platformatic db migrate --to 000
+npx platformatic db migrate -r
 ```
 
 - The reason is that this has been created by default migrations created with `platformatic db init`. 
@@ -209,7 +211,6 @@ NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https:
 - Remember to change `001.undo.sql` too:
 
 ```sql 
-
 DROP TABLE quotes;
 ```
 - Then, stop and run Platformatic DB again: 
@@ -481,7 +482,7 @@ See: https://github.com/platformatic/platformatic/issues/55
 # Step 5: Plugins 
 
 - Platformatic DB can be extended with [**Fastify Plugins**](https://www.fastify.io/docs/latest/Reference/Plugins/)
-- When Platformatic DB starts, loads the plugins: 
+- When Platformatic DB starts, loads the plugins (try adding a `app.log.info` in `plugin.js`).
 
 ```shell {2}
 [10:09:20.052] INFO (146270): running 003.do.sql
@@ -578,11 +579,17 @@ module.exports = async function plugin (app) {
 
 - Try the mutation with GraphiQL
 
+
+<!--
+mutation {
+  likeQuote(id: 1) 
+}
+-->
+
 ---
 
 # Step 7: Setup UI
-
-- Copy from `./steps/07-ui/movie-quotes/apps/movie-quotes-frontend`
+- Remember you cloned the workshop? Grab `./steps/07-ui/movie-quotes/apps/movie-quotes-frontend` and copy the folder `movie-quotes-frontend` aside `movie-quotes-api`
 
 - In the frontend folder, run:
 ```shell

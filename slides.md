@@ -313,7 +313,7 @@ Open GraphiQL and try to create a movie:
 
 ```graphql
 mutation {
-  saveMovie(input: { name: "The Wizard of Oz" }) {
+  saveMovie(input: { title: "The Wizard of Oz" }) {
     id
   }
 }

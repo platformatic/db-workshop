@@ -283,8 +283,6 @@ http://localhost:3042/documentation
 
 # Step 3: Add Relationship 
 
-- Stop Platformatic DB.
-
 - Create `./migrations/002.do.sql`:
 ```sql
 CREATE TABLE movies (
@@ -302,12 +300,10 @@ ALTER TABLE quotes DROP COLUMN movie_id;
 DROP TABLE movies;
 ```
 
-- Start Platformatic DB:
+- Apply the new migration (the server will restart automatically):
 
-```shell {1}
-[17:52:03.881] INFO (94146): running 002.do.sql
-[17:52:04.066] INFO (94146): server listening
-    url: "http://127.0.0.1:3042"
+```bash 
+npx platformatic db migrate
 ```
 ---
 

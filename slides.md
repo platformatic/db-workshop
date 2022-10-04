@@ -475,27 +475,29 @@ npx platformatic db seed seed.js
 
 # Step 5: Build a "like" quote feature
 
-- Create and apply this migration (remember the `undo` script): 
+- Create a new migration (remember the `undo` script):
 ```sql
 ALTER TABLE quotes ADD COLUMN likes INTEGER default 0;
+```
+
+- Apply the migration:
+
+```bash
+npx platformatic db migrate
+
 ```
 
 - Check `plugin.js`:
 
 ```js
-module.exports = async function plugin (app) {
-  app.log.info('plugin loaded')
-}
+module.exports = async function (app) {}
 ```
 
 - ...and the configuration in `platformatic.db.json`:
 
-```json{6-8}
+```json{3-5}
 {
   ...
-  "migrations": {
-    "dir": "./migrations"
-  },
   "plugin": {
     "path": "./plugin.js"
   }

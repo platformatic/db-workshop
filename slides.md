@@ -340,6 +340,7 @@ type Query {
 - Some code generators that can process it:
   - https://www.the-guild.dev/graphql/codegen
   - https://github.com/apollographql/apollo-tooling
+  - https://github.com/horiuchi/dtsgenerator
 
 <!-- 
 Link to generators from schema 

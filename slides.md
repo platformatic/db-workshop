@@ -126,7 +126,7 @@ npm start
     "port": 3042
   },
   "core": {
-    "connectionString": "sqlite://movie-quotes.sqlite",
+    "connectionString": "sqlite://./db.sqlite",
     "graphiql": true
   },
   "migrations": {
@@ -178,7 +178,7 @@ layout: two-cols
 PORT=3042
 PLT_SERVER_HOSTNAME=127.0.0.1
 PLT_SERVER_LOGGER_LEVEL=info
-DATABASE_URL=sqlite://movie-quotes.sqlite
+DATABASE_URL=sqlite://./db.sqlite
 ```
 
 ---
@@ -205,7 +205,7 @@ http://localhost:3042/documentation
 
 # Step 2: Create DB schema (1/3)
 
-- Migrate `movie-quotes.sqlite` back (or you can remove the `movie-quotes.sqlite` file):
+- Migrate `db.sqlite` back (or you can remove the `db.sqlite` file):
 ```shell
 npx platformatic db migrate -r
 ```
@@ -247,9 +247,9 @@ npx platformatic db migrate
 
 - In case you edit the migrations file before running the rollback,
   the database will be on a non-consistent state.
-  You might need to delete the `movie-quotes.sqlite` file and restart the server:
+  You might need to delete the `db.sqlite` file and restart the server:
 ```shell
-rm movie-quotes.sqlite
+rm db.sqlite
 npm start
 ```
 ---
@@ -456,7 +456,7 @@ module.exports = async function ({ entities, db, sql }) {
 ---
 
 # Step 4: apply the seed
-- You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `movie-quotes.sqlite` also works.
+- You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works.
 ```shell
 npx platformatic db migrate --to 000
 ```

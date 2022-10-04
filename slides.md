@@ -25,7 +25,7 @@ Do we need the NodeConf logo?
 
 Platformatic DB allows you to:
 
-- Create both [**OpenAPI**](https://www.openapis.org) and [**GraphQL**](https://graphql.org) schemas from your database, without having to write a single line of code. 
+- Create both [**OpenAPI**](https://www.openapis.org) and [**GraphQL**](https://graphql.org) schemas from your database, without having to write a single line of code.
 - All customizable via [**Nodejs**](https://nodejs.org) and [**Fastify**](https://www.fastify.io/) plugins.
 
 <br>
@@ -70,14 +70,14 @@ We don't need to npm install because they just need the steps
 
 ---
 
-# Step 1: Initial Setup 1/2 
+# Step 1: Initial Setup 1/2
 
 - Create a folder for the project and the backend:
 ```shell
 mkdir -p movie-quotes/apps/movie-quotes-api/
 ```
 
-- `cd` into it: 
+- `cd` into it:
 
 ```shell
 cd movie-quotes/apps/movie-quotes-api/
@@ -117,7 +117,7 @@ npm start
 
 ---
 
-# Check the created **platformatic.db.json** 
+# Check the created **platformatic.db.json**
 
 ```json
 {
@@ -126,7 +126,7 @@ npm start
     "port": 3042
   },
   "core": {
-    "connectionString": "sqlite://./db.sqlite",
+    "connectionString": "sqlite://movie-quotes.sqlite",
     "graphiql": true
   },
   "migrations": {
@@ -142,13 +142,13 @@ It's possible to use env variables too for the configuration values (next slide)
 
 
 ---
-layout: two-cols 
+layout: two-cols
 ---
 
-- #### All variables MUST be prefixed with `PLT_` 
+- #### All variables MUST be prefixed with `PLT_`
 - #### ...with some (configurable) exceptions:
   #### (`['PORT', 'DATABASE_URL']`)
-- #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information 
+- #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information
 - #### We added the mandatory `PLT_` prefix to prevent accidental exposure of API keys.
 
 ::right::
@@ -178,7 +178,7 @@ layout: two-cols
 PORT=3042
 PLT_SERVER_HOSTNAME=127.0.0.1
 PLT_SERVER_LOGGER_LEVEL=info
-DATABASE_URL=sqlite://./movie-quotes.sqlite
+DATABASE_URL=sqlite://movie-quotes.sqlite
 ```
 
 ---
@@ -205,12 +205,12 @@ http://localhost:3042/documentation
 
 # Step 2: Create DB schema (1/3)
 
-- Migrate `db.sqlite` back (or you can remove the `db.sqlite` file):
+- Migrate `movie-quotes.sqlite` back (or you can remove the `movie-quotes.sqlite` file):
 ```shell
 npx platformatic db migrate -r
 ```
 
-- The reason is that this has been created by default migrations created with `platformatic db init`. 
+- The reason is that this has been created by default migrations created with `platformatic db init`.
 
 - Now we want to specify our own DB schema.
 
@@ -225,14 +225,14 @@ CREATE TABLE quotes (
 ```
 
 <!--
-NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https://github.com/platformatic/platformatic/issues/44 
+NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https://github.com/platformatic/platformatic/issues/44
 -->
 ---
 
 # Step 2: Create DB schema (2/3)
 - Remember to change `001.undo.sql` too:
 
-```sql 
+```sql
 DROP TABLE quotes;
 ```
 
@@ -245,23 +245,23 @@ npx platformatic db migrate
 - You can now reload your GraphiQL and OpenAPI pages and you will
   automatically see the updated schemas as the migrations are auto-applied.
 
-- In case you edit the migrations file before running the rollback, 
+- In case you edit the migrations file before running the rollback,
   the database will be on a non-consistent state.
-  You might need to delete the `db.sqlite` file and restart the server:
+  You might need to delete the `movie-quotes.sqlite` file and restart the server:
 ```shell
-rm db.sqlite
+rm movie-quotes.sqlite
 npm start
 ```
 ---
 
-# Step 2: Create DB schema (3/3) 
+# Step 2: Create DB schema (3/3)
 
-- Note that migration `001.do.sql` is applied: 
+- Note that migration `001.do.sql` is applied:
 
 <img src="/assets/step-2-run.png" width="350" class="center">
 
 Platformatic is now exposing the 'quotes' entity through GraphQL and OpenAPI!
- 
+
 ---
 
 # GraphiQL
@@ -281,7 +281,7 @@ http://localhost:3042/documentation
 
 ---
 
-# Step 3: Add Relationship 
+# Step 3: Add Relationship
 
 - Create `./migrations/002.do.sql`:
 ```sql
@@ -302,12 +302,12 @@ DROP TABLE movies;
 
 - Apply the new migration (the server will restart automatically):
 
-```bash 
+```bash
 npx platformatic db migrate
 ```
 ---
 
-# Step 3: Add Relationship 
+# Step 3: Add Relationship
 
 Open GraphiQL and try to create a movie:
 
@@ -319,14 +319,14 @@ mutation {
 }
 
 ```
-And (assuming `movieId` is 1): 
+And (assuming `movieId` is 1):
 
 ```graphql
 mutation {
   saveQuote(
     input: {
-      quote: "Toto, I've got a feeling we're not in Kansas anymore", 
-      movieId: 1, 
+      quote: "Toto, I've got a feeling we're not in Kansas anymore",
+      movieId: 1,
       saidBy: "Dorothy Gale"}
   ) {
     id
@@ -356,7 +356,7 @@ npx platformatic db schema graphql >> schema.sdl
 ```
 
 ```shell
-cat schema.sdl     
+cat schema.sdl
 type Query {
   getQuoteById(id: ID!): Quote
   quotes(limit: Int, offset: Int, orderBy: [QuoteOrderByArguments], where: QuoteWhereArguments): [Quote]
@@ -371,8 +371,8 @@ type Query {
   - https://github.com/apollographql/apollo-tooling
   - https://github.com/horiuchi/dtsgenerator
 
-<!-- 
-Link to generators from schema 
+<!--
+Link to generators from schema
 -->
 
 ---
@@ -380,7 +380,7 @@ Link to generators from schema
 # Step 4: Seed the Database
 
 - #### The `platformatic db seed` command allow to run a script that populates the DB.
-- #### The script needs to export a function, like this example: 
+- #### The script needs to export a function, like this example:
 
 ```js
 'use strict'
@@ -456,17 +456,17 @@ module.exports = async function ({ entities, db, sql }) {
 ---
 
 # Step 4: apply the seed
-- You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works. 
+- You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `movie-quotes.sqlite` also works.
 ```shell
 npx platformatic db migrate --to 000
 ```
 
-- Then run migrations: 
+- Then run migrations:
 ```shell
 npx platformatic db migrate
 ```
 
-- ...and seed: 
+- ...and seed:
 ```shell
 npx platformatic db seed seed.js
 ```
@@ -505,14 +505,14 @@ module.exports = async function (app) {}
 
 ```
 
-<!-- 
-Here we will have plugin.js and config that are generated on the first migration (instead of during `init`). 
+<!--
+Here we will have plugin.js and config that are generated on the first migration (instead of during `init`).
 See: https://github.com/platformatic/platformatic/issues/55
 -->
 
 ---
 
-# Step 5: Plugins 
+# Step 5: Plugins
 
 - Platformatic DB can be extended with [**Fastify Plugins**](https://www.fastify.io/docs/latest/Reference/Plugins/)
 - When Platformatic DB starts, loads the plugins (try adding a `app.log.info` in `plugin.js`).
@@ -526,8 +526,8 @@ See: https://github.com/platformatic/platformatic/issues/55
 
 ---
 
- 
-## "like quote" with REST 
+
+## "like quote" with REST
 - #### Install `npm i fluent-json-schema`
 - #### ...use it in `plugin.js`:
 
@@ -560,9 +560,9 @@ module.exports = async function plugin (app) {
 
 # Step 6: `likeQuote` mutation
 
-- We can extract a `incrementQuoteLikes` function for reuse in `plugin.js`: 
+- We can extract a `incrementQuoteLikes` function for reuse in `plugin.js`:
 
-```js{5-13,18-20} 
+```js{5-13,18-20}
 const S = require('fluent-json-schema')
 module.exports = async function plugin (app) {
   app.log.info('plugin loaded')
@@ -615,7 +615,7 @@ module.exports = async function plugin (app) {
 
 <!--
 mutation {
-  likeQuote(id: 1) 
+  likeQuote(id: 1)
 }
 -->
 
@@ -630,15 +630,15 @@ npm install
 npm start
 ```
 
-This should start: 
+This should start:
 ```shell {8}
-➜ npm start  
+➜ npm start
 
 > start
 > astro dev --port 3000
 
   🚀  astro  v1.3.1 started in 38ms
-  
+
   ┃ Local    http://localhost:3000/
   ┃ Network  use --host to expose
 ```
@@ -677,20 +677,20 @@ layout: two-cols
 ---
 
 
-# Open with the browser 
+# Open with the browser
 
 ::right::
 <img src="/assets/step-7-ui.png" width="400" class="center">
 
 ---
 
-# Next Steps 
+# Next Steps
 
 - Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://oss.platformatic.dev/docs/next/guides/jwt-auth0)).
 - Add authorizations at API level (see [references](https://oss.platformatic.dev/docs/next/reference/db-authorization/introduction))
-- Generate [TypeScript](https://www.typescriptlang.org/) types 
+- Generate [TypeScript](https://www.typescriptlang.org/) types
 
-<!-- 
+<!--
 Others??
 -->
 
@@ -698,10 +698,10 @@ Others??
 
 # Thanks!!!!! 👋
 
-<div class="logo" /> 
+<div class="logo" />
 
 - https://oss.platformatic.dev/
 - https://blog.platformatic.dev/
 - <carbon-logo-github /> https://github.com/platformatic
-- <carbon-logo-discord /> https://discord.gg/platformatic 
+- <carbon-logo-discord /> https://discord.gg/platformatic
 - <carbon-logo-twitter /> https://twitter.com/platformatic

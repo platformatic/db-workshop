@@ -236,6 +236,12 @@ NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https:
 DROP TABLE quotes;
 ```
 
+- Apply the migrations:
+```bash
+npx platformatic db migrate
+
+```
+
 - You can now reload your GraphiQL and OpenAPI pages and you will
   automatically see the updated schemas as the migrations are auto-applied.
 

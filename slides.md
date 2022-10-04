@@ -149,6 +149,7 @@ layout: two-cols
 - #### ...with some (configurable) exceptions:
   #### (`['PORT', 'DATABASE_URL']`)
 - #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information 
+- #### We added the mandatory `PLT_` prefix to prevent accidental exposure of API keys.
 
 ::right::
 
@@ -179,6 +180,26 @@ PLT_SERVER_HOSTNAME=127.0.0.1
 PLT_SERVER_LOGGER_LEVEL=info
 DATABASE_URL=sqlite://./movie-quotes.sqlite
 ```
+
+---
+
+# GraphiQL
+
+http://localhost:3042/graphiql
+
+
+
+<img src="/assets/step-1-graphiql.png" width="600" class="right">
+
+
+---
+
+# OpenApi
+
+http://localhost:3042/documentation
+
+<img src="/assets/step-1-openapi.png" width="500" class="left">
+
 
 ---
 
@@ -214,8 +235,15 @@ NOTE that `npx platformatic db migrate --to 000` won't work until we fix: https:
 ```sql 
 DROP TABLE quotes;
 ```
-- Then, stop and run Platformatic DB again: 
+
+- You can now reload your GraphiQL and OpenAPI pages and you will
+  automatically see the updated schemas as the migrations are auto-applied.
+
+- In case you edit the migrations file before running the rollback, 
+  the database will be on a non-consistent state.
+  You might need to delete the `db.sqlite` file and restart the server:
 ```shell
+rm db.sqlite
 npm start
 ```
 ---
@@ -235,22 +263,21 @@ Platformatic is now exposing the 'quotes' entity through GraphQL and OpenAPI!
 http://localhost:3042/graphiql
 
 
-
 <img src="/assets/step-2-graphiql.png" width="600" class="right">
-
 
 ---
 
 # OpenApi
 
-http://localhost:3042/documentation/static/index.html
+http://localhost:3042/documentation
 
 <img src="/assets/step-2-openapi.png" width="500" class="left">
-
 
 ---
 
 # Step 3: Add Relationship 
+
+- Stop Platformatic DB.
 
 - Create `./migrations/002.do.sql`:
 ```sql
@@ -269,7 +296,7 @@ ALTER TABLE quotes DROP COLUMN movie_id;
 DROP TABLE movies;
 ```
 
-- Stop and start Platformatic DB:
+- Start Platformatic DB:
 
 ```shell {1}
 [17:52:03.881] INFO (94146): running 002.do.sql
@@ -351,7 +378,7 @@ Link to generators from schema
 # Step 4: Seed the Database
 
 - #### The `platformatic db seed` command allow to run a script that populates the DB.
-- #### The script needs to export a function: 
+- #### The script needs to export a function, like this example: 
 
 ```js
 'use strict'
@@ -427,7 +454,7 @@ module.exports = async function ({ entities, db, sql }) {
 ---
 
 # Step 4: apply the seed
-- To start from a clean slate, we need to reset the db first, so we can migrate to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works. 
+- You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works. 
 ```shell
 npx platformatic db migrate --to 000
 ```

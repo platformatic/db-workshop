@@ -3,6 +3,7 @@ theme: platformatic
 highlighter: prism
 lineNumbers: true
 favicon: ./assets/favicon.ico
+css: unocss
 align: center
 title: Introducing Platformatic DB
 layout: cover
@@ -11,13 +12,8 @@ layout: cover
 # Introducing Platformatic DB
 
 <div class="logo" />
-NodeConf.eu 2022
 
 [https://platformatic.dev/db-workshop](https://platformatic.dev/db-workshop)
-
-<!--
-Do we need the NodeConf logo?
--->
 
 ---
 
@@ -70,7 +66,7 @@ We don't need to npm install because they just need the steps
 
 ---
 
-# Step 1: Initial Setup 1/2
+# Step 1: Initial Setup 1/3
 
 - Create a folder for the project and the backend:
 ```shell
@@ -84,23 +80,23 @@ cd movie-quotes/apps/movie-quotes-api/
 
 ```
 
-- init `npm` and install platformatic:
-```shell {1|2|3-4|all}
-npm init --yes
-npm install platformatic
-npm pkg set scripts.start="platformatic db start"
-```
-
----
-layout: two-cols
----
-
-# Step 1: Initial Setup 2/2
-- Init **platformatic.db**:
+- init `npm` and create a platformatic project:
 
 ```shell
-npx platformatic db init
+npx create-platformatic@latest  
+
 ```
+
+---
+
+# Step 1: Initial Setup 2/3
+
+<img src="/assets/step-1-create.png" heigth="550" class="center">
+
+
+---
+
+# Step 1: Initial Setup 3/3
 
 - Start **platformatic.db**:
 
@@ -108,9 +104,9 @@ npx platformatic db init
 npm start
 
 ```
-::right::
 
-<img src="/assets/step-2-run.png" width="350" class="center">
+
+<img src="/assets/step-1-run.png"  class="center">
 
 <!--
 -->
@@ -121,16 +117,23 @@ npm start
 
 ```json
 {
+  "$schema": "https://platformatic.dev/schemas/v0.19.2/db",
   "server": {
-    "hostname": "127.0.0.1",
-    "port": 3042
+    "hostname": "{PLT_SERVER_HOSTNAME}",
+    "port": "{PORT}",
+    "logger": {
+      "level": "{PLT_SERVER_LOGGER_LEVEL}"
+    }
   },
-  "core": {
-    "connectionString": "sqlite://./db.sqlite",
-    "graphiql": true
+  "db": {
+    "connectionString": "{DATABASE_URL}",
+    "graphql": true,
+    "openapi": true
   },
   "migrations": {
-    "dir": "./migrations"
+    "dir": "migrations"
+  },
+  "plugins": { // (...)
   },
   "types": {
     "autogenerate": true
@@ -138,7 +141,7 @@ npm start
 }
 ```
 
-It's possible to use env variables too for the configuration values (next slide)
+Note that platformatic uses `env` variables for the configuration.
 
 
 ---
@@ -148,7 +151,7 @@ layout: two-cols
 - #### All variables MUST be prefixed with `PLT_`
 - #### ...with some (configurable) exceptions:
   #### (`['PORT', 'DATABASE_URL']`)
-- #### See [the reference](https://oss.platformatic.dev/docs/reference/configuration/#configuration-placeholders) for more information
+- #### See [the reference](https://oss.platformatic.dev/docs/reference/db/configuration#environment-variable-placeholders) for more information
 - #### We added the mandatory `PLT_` prefix to prevent accidental exposure of API keys.
 
 ::right::
@@ -163,7 +166,7 @@ layout: two-cols
     "hostname": "{PLT_SERVER_HOSTNAME}",
     "port": "{PORT}"
   },
-  "core": {
+  "db": {
     "connectionString": "{DATABASE_URL}"
   },
   "migrations": {
@@ -189,7 +192,7 @@ http://localhost:3042/graphiql
 
 
 
-<img src="/assets/step-1-graphiql.png" width="600" class="right">
+<img src="/assets/step-1-graphiql.png" width="650" class="right">
 
 
 ---
@@ -198,7 +201,7 @@ http://localhost:3042/graphiql
 
 http://localhost:3042/documentation
 
-<img src="/assets/step-1-openapi.png" width="500" class="left">
+<img src="/assets/step-1-openapi.png" width="650" class="left">
 
 
 ---
@@ -207,14 +210,10 @@ http://localhost:3042/documentation
 
 - Migrate `db.sqlite` back (or you can remove the `db.sqlite` file):
 ```shell
-npx platformatic db migrate -r
+npx platformatic db migrations apply --to 000
 ```
 
-- The reason is that this has been created by default migrations created with `platformatic db init`.
-
-- Now we want to specify our own DB schema.
-
-- Edit `./migrations/001.do.sql` to be:
+- Now we want to specify our own DB schema, edit `./migrations/001.do.sql` to be:
 ```sql
 CREATE TABLE quotes (
   id INTEGER PRIMARY KEY,
@@ -238,7 +237,7 @@ DROP TABLE quotes;
 
 - Apply the migrations:
 ```bash
-npx platformatic db migrate
+npx platformatic db migrations apply 
 
 ```
 
@@ -258,7 +257,7 @@ npm start
 
 - Note that migration `001.do.sql` is applied:
 
-<img src="/assets/step-2-run.png" width="350" class="center">
+<img src="/assets/step-2-run.png" width="500" class="center">
 
 Platformatic is now exposing the 'quotes' entity through GraphQL and OpenAPI!
 
@@ -303,7 +302,7 @@ DROP TABLE movies;
 - Apply the new migration (the server will restart automatically):
 
 ```bash
-npx platformatic db migrate
+npx platformatic db migrations apply
 ```
 ---
 
@@ -458,12 +457,12 @@ module.exports = async function ({ entities, db, sql }) {
 # Step 4: apply the seed
 - You might want to reset the database to a clean slate by migrating to initial state (the undo scripts will drop the tables). Removing `db.sqlite` also works.
 ```shell
-npx platformatic db migrate --to 000
+npx platformatic db migrations apply --to 000
 ```
 
 - Then run migrations:
 ```shell
-npx platformatic db migrate
+npx platformatic db migrations apply
 ```
 
 - ...and seed:
@@ -483,7 +482,7 @@ ALTER TABLE quotes ADD COLUMN likes INTEGER default 0;
 - Apply the migration:
 
 ```bash
-npx platformatic db migrate
+npx platformatic db migrations apply
 
 ```
 
@@ -495,11 +494,13 @@ module.exports = async function (app) {}
 
 - ...and the configuration in `platformatic.db.json`:
 
-```json{3-5}
+```json{3-7}
 {
   ...
-  "plugin": {
-    "path": "./plugin.js"
+  "plugins": {
+    "paths": [
+      "plugin.js"
+    ]
   }
 }
 
@@ -532,11 +533,10 @@ See: https://github.com/platformatic/platformatic/issues/55
 - #### ...use it in `plugin.js`:
 
 
-```js {1,5-17}
+```js {1,4-16}
 const S = require('fluent-json-schema')
 module.exports = async function plugin (app) {
   app.log.info('plugin loaded')
-
   const schema = {
     params: S.object().prop('id', app.getSchema('Quote').properties.id)
   }
@@ -566,7 +566,6 @@ module.exports = async function plugin (app) {
 const S = require('fluent-json-schema')
 module.exports = async function plugin (app) {
   app.log.info('plugin loaded')
-
   async function incrementQuoteLikes (id) {
     const { db, sql } = app.platformatic
 
@@ -579,7 +578,6 @@ module.exports = async function plugin (app) {
   const schema = {
     params: S.object().prop('id', app.getSchema('Quote').properties.id)
   }
-
   app.post('/quotes/:id/like', { schema }, async function (request, response) {
     return { likes: await incrementQuoteLikes(request.params.id) }
   })
@@ -673,14 +671,10 @@ BONUS STEP.
 -->
 
 ---
-layout: two-cols
----
-
 
 # Open with the browser
 
-::right::
-<img src="/assets/step-7-ui.png" width="400" class="center">
+<img src="/assets/step-7-ui.png" width="500" class="center">
 
 ---
 

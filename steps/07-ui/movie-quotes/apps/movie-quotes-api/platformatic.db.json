@@ -9,9 +9,10 @@
       "origin": "http://localhost:3000"
     }
   },
-  "core": {
+  "db": {
     "connectionString": "sqlite://db.sqlite",
     "graphiql": true,
+    "openapi": true,
     "ignore": {
       "versions": true
     }
@@ -23,7 +24,9 @@
   "types": {
     "autogenerate": true
   },
-  "plugin": {
-    "path": "./plugin.js"
+  "plugins": {
+    "paths": [
+      "plugin.js"
+    ]
   }
 }

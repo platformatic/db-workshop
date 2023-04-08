@@ -8,13 +8,13 @@
     "test": " c8 tap --no-cov -j1 --ts"
   },
   "dependencies": {
-    "@slidev/cli": "^0.36.5",
-    "slidev-theme-platformatic": "^0.1.0",
+    "@slidev/cli": "^0.40.6",
+    "slidev-theme-platformatic": "^0.1.2",
     "@slidev/theme-default": "*",
     "@slidev/theme-seriph": "*"
   },
   "devDependencies": {
-    "c8": "^7.12.0",
-    "tap": "^16.3.0"
+    "c8": "^7.13.0",
+    "tap": "^16.3.4"
   }
 }

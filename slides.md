@@ -672,16 +672,123 @@ BONUS STEP.
 
 ---
 
-# Open with the browser
+# Step 7: Open with the browser
 
 <img src="/assets/step-7-ui.png" width="500" class="center">
 
 ---
 
-# Next Steps
 
-- Create a **Composition** to expose your backend (see [here](https://blog.platformatic.dev/introducing-platformatic-composition))
-- Deploy all your services as a **Runtime** (see [here](https://blog.platformatic.dev/introducing-platformatic-runtime))
+# Step 8: Deploy on Platformatic Cloud
+
+- Point your browser to https://platformatic.cloud
+- Login with github (you may beed to accept the terms and conditions if not done yet)
+- You should see the **Dashboard** page on your personal organization, which is created automatically. Click on "Create an App"
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-org.png" width="400"/>
+</div>
+---
+
+# Step 8: Create an Application
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-create-app.png"/>
+</div>
+
+---
+
+# Step 8: Create a Wokspace
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace.png"/>
+</div>
+
+---
+
+# Step 8: Wokspace ID and Key
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ids.png"/>
+</div>
+
+---
+
+# Step 8: Download the Workspace env
+
+- You can also download the `env` file with both workspaceId and the key. 
+- The file is called `${workspace-name}.plt.txt`
+- Save it in `movie-quotes/apps/movie-quotes-api` folder in your project
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ids-2.png" width="500"/>
+</div>
+
+---
+
+# Step 8: Now the Workspace is ready!
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ready.png"/>
+</div>
+
+---
+
+# Step 8: Deploy using the CLI 
+
+- Go in the `movie-quotes-api` folder:
+```bash
+ cd ./movie-quotes/apps/movie-quotes-api 
+```
+
+- Launch the deployment:
+
+```bash
+npx platformatic deploy --keys=./test-workspace-demo.plt.txt
+```
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy.png"/>
+</div>
+
+---
+
+# Step 8: Check the deployment:
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy-ok.png" width="800"/>
+</div>
+
+---
+
+# Step 8: Test the deployment:
+
+```bash
+curl https://gorgeous-vacuous-young-chalk.deploy.space/quotes
+```
+
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy-test.png" width="500"/>
+</div>
+
+
+---
+
+# Step 8: Connect the UI to the deployed API 
+
+- Open `movie-quotes/apps/movie-quotes-frontend/.env` and change `PUBLIC_GRAPHQL_API_ENDPOINT` to the deployed API endpoint (use the actual URL):
+
+
+```js
+PUBLIC_GRAPHQL_API_ENDPOINT=https://gorgeous-vacuous-young-chalk.deploy.space/graphql
+```
+
+- Restart the frontend dev server and check the UI is still working
+
+---
+
+# Next Steps
  
 - Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://oss.platformatic.dev/docs/next/guides/jwt-auth0)).
 - Add authorizations at API level (see [references](https://oss.platformatic.dev/docs/next/reference/db-authorization/introduction))

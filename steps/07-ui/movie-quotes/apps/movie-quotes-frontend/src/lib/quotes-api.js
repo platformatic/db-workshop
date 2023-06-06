@@ -1,8 +1,9 @@
-import { createClient, gql } from '@urql/core'
+import { createClient, gql, dedupExchange, cacheExchange, fetchExchange } from '@urql/core'
 
 const graphqlClient = createClient({
   url: import.meta.env.PUBLIC_GRAPHQL_API_ENDPOINT,
-  requestPolicy: 'network-only'
+  requestPolicy: 'network-only',
+  exchanges: [dedupExchange, cacheExchange, fetchExchange]
 })
 
 async function graphqlClientWrapper (method, gqlQuery, queryVariables = {}) {

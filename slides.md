@@ -698,7 +698,7 @@ BONUS STEP.
 
 ---
 
-# Step 8: Create a Wokspace
+# Step 8: Create a Workspace
 
 <div flex justify-center m-4>
     <img src="/assets/step-8-workspace.png"/>
@@ -706,7 +706,7 @@ BONUS STEP.
 
 ---
 
-# Step 8: Wokspace ID and Key
+# Step 8: Workspace ID and Key
 
 <div flex justify-center m-4>
     <img src="/assets/step-8-workspace-ids.png"/>

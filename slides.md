@@ -242,22 +242,15 @@ npx platformatic db migrations apply
 ```
 
 - You can now reload your GraphiQL and OpenAPI pages and you will
-  automatically see the updated schemas as the migrations are auto-applied.
+  automatically see the updated schemas.
 
-- In case you edit the migrations file before running the rollback,
-  the database will be on a non-consistent state.
-  You might need to delete the `db.sqlite` file and restart the server:
-```shell
-rm db.sqlite
-npm start
-```
 ---
 
 # Step 2: Create DB schema (3/3)
 
 - Note that migration `001.do.sql` is applied:
 
-<img src="/assets/step-2-run.png" width="500" class="center">
+<img src="/assets/step-2-run.png" width="600" class="center">
 
 Platformatic is now exposing the 'quotes' entity through GraphQL and OpenAPI!
 
@@ -494,15 +487,13 @@ module.exports = async function (app) {}
 
 - ...and the configuration in `platformatic.db.json`:
 
-```json{3-7}
-{
+```json{2-7}
   ...
   "plugins": {
     "paths": [
       "plugin.js"
     ]
   }
-}
 
 ```
 
@@ -516,7 +507,14 @@ See: https://github.com/platformatic/platformatic/issues/55
 # Step 5: Plugins
 
 - Platformatic DB can be extended with [**Fastify Plugins**](https://www.fastify.io/docs/latest/Reference/Plugins/)
-- When Platformatic DB starts, loads the plugins (try adding a `app.log.info` in `plugin.js`).
+- When Platformatic DB starts, loads the plugins (try adding a `app.log.info` in `plugin.js`):
+
+```javascript{2}
+module.exports = async function (app) {
+  app.log.info('plugin loaded')
+}
+```
+See the log on the server:
 
 ```shell {2}
 [10:09:20.052] INFO (146270): running 003.do.sql
@@ -562,7 +560,7 @@ module.exports = async function plugin (app) {
 
 - We can extract a `incrementQuoteLikes` function for reuse in `plugin.js`:
 
-```js{5-13,18-20}
+```js{4-12,16-18}
 const S = require('fluent-json-schema')
 module.exports = async function plugin (app) {
   app.log.info('plugin loaded')
@@ -607,9 +605,11 @@ module.exports = async function plugin (app) {
 }
 
 ```
+---
 
-- Try the mutation with GraphiQL
+# Try the mutation with GraphiQL
 
+<img src="/assets/step-6-mutation.png" class="center">
 
 <!--
 mutation {
@@ -628,15 +628,15 @@ npm install
 npm start
 ```
 
-This should start:
+You should see this:
 ```shell {8}
-➜ npm start
+➜ npm start  
 
 > start
 > astro dev --port 3000
 
-  🚀  astro  v1.3.1 started in 38ms
-
+  🚀  astro  v1.9.2 started in 72ms
+  
   ┃ Local    http://localhost:3000/
   ┃ Network  use --host to expose
 ```
@@ -663,7 +663,7 @@ Apparently, `vite` starts on http://localhost:3000/ on linux, and  http://127.0.
 }
 ```
 
-- Restart the Platformatic DB server
+- ~~Restart the Platformatic DB server~~ (not needed! 🎉)
 
 <!--
 BONUS STEP.
@@ -672,14 +672,124 @@ BONUS STEP.
 
 ---
 
-# Open with the browser
+# Step 7: Open with the browser
 
 <img src="/assets/step-7-ui.png" width="500" class="center">
 
 ---
 
-# Next Steps
 
+# Step 8: Deploy on Platformatic Cloud
+
+- Point your browser to https://platformatic.cloud
+- Login with github (you may beed to accept the terms and conditions if not done yet)
+- You should see the **Dashboard** page on your personal organization, which is created automatically. Click on "Create an App"
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-org.png" width="400"/>
+</div>
+---
+
+# Step 8: Create an Application
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-create-app.png"/>
+</div>
+
+---
+
+# Step 8: Create a Wokspace
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace.png"/>
+</div>
+
+---
+
+# Step 8: Wokspace ID and Key
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ids.png"/>
+</div>
+
+---
+
+# Step 8: Download the Workspace env
+
+- You can also download the `env` file with both workspaceId and the key. 
+- The file is called `${workspace-name}.plt.txt`
+- Save it in `movie-quotes/apps/movie-quotes-api` folder in your project
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ids-2.png" width="500"/>
+</div>
+
+---
+
+# Step 8: Now the Workspace is ready!
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-workspace-ready.png"/>
+</div>
+
+---
+
+# Step 8: Deploy using the CLI 
+
+- Go in the `movie-quotes-api` folder:
+```bash
+ cd ./movie-quotes/apps/movie-quotes-api 
+```
+
+- Launch the deployment:
+
+```bash
+npx platformatic deploy --keys=./test-workspace-demo.plt.txt
+```
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy.png"/>
+</div>
+
+---
+
+# Step 8: Check the deployment:
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy-ok.png" width="800"/>
+</div>
+
+---
+
+# Step 8: Test the deployment:
+
+```bash
+curl https://gorgeous-vacuous-young-chalk.deploy.space/quotes
+```
+
+
+<div flex justify-center m-4>
+    <img src="/assets/step-8-deploy-test.png" width="500"/>
+</div>
+
+
+---
+
+# Step 8: Connect the UI to the deployed API 
+
+- Open `movie-quotes/apps/movie-quotes-frontend/.env` and change `PUBLIC_GRAPHQL_API_ENDPOINT` to the deployed API endpoint (use the actual URL):
+
+
+```js
+PUBLIC_GRAPHQL_API_ENDPOINT=https://gorgeous-vacuous-young-chalk.deploy.space/graphql
+```
+
+- Restart the frontend dev server and check the UI is still working
+
+---
+
+# Next Steps
+ 
 - Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://oss.platformatic.dev/docs/next/guides/jwt-auth0)).
 - Add authorizations at API level (see [references](https://oss.platformatic.dev/docs/next/reference/db-authorization/introduction))
 - Generate [TypeScript](https://www.typescriptlang.org/) types

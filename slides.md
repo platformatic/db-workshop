@@ -39,8 +39,8 @@ Read more about [Platformatic](https://oss.platformatic.dev/)
 
 ## Requirements
 
-- [Node.js](https://nodejs.org/) >= v16.17.0 or >= v18.8.0
-- [npm](https://docs.npmjs.com/cli/) v7 or later
+- [Node.js](https://nodejs.org/) >= v18.8.0
+- [npm](https://docs.npmjs.com/cli/) v8 or later
 - A code editor, for example [Visual Studio Code](https://code.visualstudio.com/)
 - Basic knowledge of GraphQL
 
@@ -132,8 +132,6 @@ npm start
   },
   "migrations": {
     "dir": "migrations"
-  },
-  "plugins": { // (...)
   },
   "types": {
     "autogenerate": true

@@ -32,7 +32,7 @@ Platformatic DB allows you to:
 - Multiple authentication methods: JWT, WebHook, HTTP Headers
 - Authorization via role based access control
 
-Read more about [Platformatic](https://oss.platformatic.dev/)
+Read more about [Platformatic](https://docs.platformatic.dev/)
 
 
 ---
@@ -149,7 +149,7 @@ layout: two-cols
 - #### All variables MUST be prefixed with `PLT_`
 - #### ...with some (configurable) exceptions:
   #### (`['PORT', 'DATABASE_URL']`)
-- #### See [the reference](https://oss.platformatic.dev/docs/reference/db/configuration#environment-variable-placeholders) for more information
+- #### See [the reference](https://docs.platformatic.dev/docs/reference/db/configuration#environment-variable-placeholders) for more information
 - #### We added the mandatory `PLT_` prefix to prevent accidental exposure of API keys.
 
 ::right::
@@ -788,8 +788,8 @@ PUBLIC_GRAPHQL_API_ENDPOINT=https://gorgeous-vacuous-young-chalk.deploy.space/gr
 
 # Next Steps
  
-- Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://oss.platformatic.dev/docs/next/guides/jwt-auth0)).
-- Add authorizations at API level (see [references](https://oss.platformatic.dev/docs/next/reference/db-authorization/introduction))
+- Add security integrating with a third party authentication service (like [Auth0](https://auth0.com/), see how [here](https://docs.platformatic.dev/docs/next/guides/jwt-auth0)).
+- Add authorizations at API level (see [references](https://docs.platformatic.dev/docs/next/reference/db-authorization/introduction))
 - Generate [TypeScript](https://www.typescriptlang.org/) types
 
 <!--
@@ -802,7 +802,7 @@ Others??
 
 <div class="logo" />
 
-- https://oss.platformatic.dev/
+- https://docs.platformatic.dev/
 - https://blog.platformatic.dev/
 - <carbon-logo-github /> https://github.com/platformatic
 - <carbon-logo-discord /> https://discord.gg/platformatic
